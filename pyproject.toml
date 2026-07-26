@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flowpact"
+version = "0.1.0"
+description = "Workflow + success pact CLI for AI product engagements"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [{ name = "Flowpact contributors" }]
+keywords = ["ai", "engagement", "workflow", "success-criteria", "pact"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+  "PyYAML>=6.0",
+  "jsonschema>=4.20",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+flowpact = "flowpact.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/devsinc/flowpact"
+Documentation = "https://github.com/devsinc/flowpact#readme"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+flowpact = ["resources/*.json", "resources/templates/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

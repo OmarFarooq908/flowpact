@@ -1,0 +1,228 @@
+# Flowpact example — Northwind Benefits Answer Copilot (synthetic)
+# Unrelated fictional domain used only to exercise schema + CLI.
+flowpact: "0.1"
+
+meta:
+  name: Northwind Benefits Answer Copilot
+  client: Northwind Benefits
+  engagement: MVP — AI draft policy answers vs SME gold
+  owners:
+    wca: Workflow Contract Author
+    delivery_lead: Delivery Lead
+    client_sponsor: Benefits Ops Lead
+  updated: "2026-07-18"
+
+glossary:
+  - term: Gold answer
+    plain_english: SME-written reference reply used to score draft quality.
+  - term: Citation URL
+    plain_english: Link to the policy page the answer relies on.
+  - term: In-scope locale
+    plain_english: Languages included in the headline accuracy claim (EN only for MVP).
+  - term: Holdout set
+    plain_english: Labeled question/answer pairs reserved for scoring — not used for prompt tuning.
+
+process:
+  stages:
+    - id: policy_corpus
+      name: Policy corpus
+      owner: Northwind Benefits
+      in_scope: true
+      does: Source of benefit policy PDFs and HTML pages.
+      inputs: []
+      outputs: [policy documents]
+
+    - id: retrieve
+      name: Retrieve passages
+      owner: Delivery team
+      in_scope: true
+      does: Fetch relevant policy chunks for a member question.
+      inputs: [member question, policy corpus]
+      outputs: [retrieved passages]
+
+    - id: draft
+      name: Draft answer
+      owner: Delivery team
+      in_scope: true
+      does: LLM drafts a structured answer from retrieved passages.
+      inputs: [member question, retrieved passages]
+      outputs: [draft_answer]
+
+    - id: score
+      name: Score vs gold
+      owner: Delivery team
+      in_scope: true
+      does: Compare draft to gold answer on the holdout set.
+      inputs: [draft_answer, gold_answer]
+      outputs: [scorecard]
+
+    - id: human_review
+      name: Human review
+      owner: Northwind Benefits
+      in_scope: true
+      does: Benefits specialist approve / edit / reject before publish.
+      inputs: [draft_answer, scorecard]
+      outputs: [approved answer]
+
+    - id: help_center_publish
+      name: Help-center publish
+      owner: Northwind Benefits
+      in_scope: false
+      does: Existing CMS publish path — out of MVP scope.
+      inputs: [approved answer]
+      outputs: [published FAQ]
+
+  boundary_note: >
+    MVP stops at human review. Help-center publish and production ticket routing
+    remain client-owned and out of scope.
+
+policies:
+  - id: accuracy_method
+    question: Is whole-answer LLM-judge the binding success metric?
+    status: resolved
+    decision: >
+      No. Binding metric is structured answer_quality (citation hard gate + answer_body soft).
+      Retrieval recall is an engineering track only.
+    owner: Delivery team / Benefits Ops
+    blocks: [answer_quality]
+
+  - id: incomplete_policy
+    question: If the retrieved policy is incomplete, skip the question or draft with a caveat?
+    status: open
+    options:
+      - Skip until policy is complete
+      - Draft with explicit caveat flag
+    decision: null
+    owner: Benefits Ops Lead
+    blocks: [answer_quality]
+
+  - id: locale_scope
+    question: Which locales are in the headline claim for MVP?
+    status: open
+    options:
+      - English only
+      - English + Spanish
+    decision: null
+    owner: Benefits Ops Lead
+    blocks: [answer_quality]
+
+success:
+  claims:
+    - id: answer_quality
+      statement: >
+        Draft answer quality vs SME gold on English in-scope benefits topics only —
+        not auto-publish to the help center. Binding recipe: missing/wrong citation_url
+        → score 0; else score = 0.70 × answer_body similarity + 0.30 × topic_tag exact match.
+      population:
+        include:
+          - field: locale
+            rule: en
+          - field: topic
+            rule: in-scope benefits topics (enrollment, coverage, claims)
+        exclude:
+          - field: locale
+            rule: non-English (until locale_scope resolved)
+          - field: topic
+            rule: HR payroll / IT helpdesk (separate product)
+      hard_gates:
+        - field: citation_url
+          rule: URL present and matches gold policy page
+          on_fail: zero_score
+      soft_fields:
+        - field: answer_body
+          method: embedding_similarity
+          weight: 0.70
+        - field: topic_tag
+          method: exact_match
+          weight: 0.30
+      aggregate: mean_score >= 0.90
+      not_measuring:
+        - retrieval recall @k
+        - help-center publish correctness
+        - production ticket deflection rate
+
+  engineering_tracks:
+    - id: retrieval_recall
+      statement: Passage recall@5 on a labeled retrieval set — tuning only.
+      blocks_claim: false
+
+evidence:
+  - id: labeled_holdout
+    what: Labeled question / gold-answer holdout for binding accuracy scoring.
+    required_for: [answer_quality]
+    status: missing
+    acceptance:
+      - Size N (flag if N < 100)
+      - Format documented (question, gold answer, citation_url, topic_tag, locale)
+      - In-scope English slice identified
+      - Access method + owner + date
+    owner: Benefits Ops Lead
+    ask: >
+      Deliver programmatic access to the labeled holdout — N, format, English in-scope
+      slice, access method, owner, and date.
+
+  - id: citation_pages
+    what: Stable policy page URLs usable as citation_url (not expired deep links).
+    required_for: [answer_quality]
+    status: partial
+    acceptance:
+      - Canonical policy URLs for enrollment, coverage, and claims topics
+      - Redirect map for retired pages
+    owner: Benefits Ops Lead
+    ask: >
+      Confirm canonical policy URLs for in-scope topics and provide a redirect map
+      for retired pages.
+
+  - id: sample_questions
+    what: Representative member questions from the last quarter (PII-redacted).
+    required_for: [answer_quality]
+    status: partial
+    acceptance:
+      - Redacted question text
+      - Topic tags
+      - Locale
+    owner: Benefits Ops Lead
+    ask: >
+      Deliver a redacted sample of recent member questions with topic and locale
+      so draft prompts can be exercised end-to-end.
+
+  - id: retrieval_labels
+    what: Labeled relevant passages per question for retrieval recall@k.
+    required_for: [retrieval_recall]
+    status: missing
+    acceptance:
+      - Question id → passage ids
+      - At least one positive passage per question
+    owner: Benefits Ops Lead
+    ask: >
+      Provide labeled relevant passages for the retrieval engineering track.
+      Does not block answer_quality.
+
+open_slots:
+  - id: holdout_access
+    severity: critical
+    status: open
+    ask: Programmatic labeled holdout (N, format, English slice, access).
+    owner: Benefits Ops Lead
+    blocks: [answer_quality]
+
+  - id: citation_canon
+    severity: high
+    status: open
+    ask: Canonical policy URLs + redirect map for citation hard gate.
+    owner: Benefits Ops Lead
+    blocks: [answer_quality]
+
+  - id: sample_queue_access
+    severity: high
+    status: resolved
+    ask: Access to redacted member-question samples for prototyping.
+    owner: Benefits Ops Lead
+    blocks: [answer_quality]
+
+  - id: retrieval_label_set
+    severity: medium
+    status: open
+    ask: Labeled passages for retrieval recall@k.
+    owner: Benefits Ops Lead
+    blocks: [retrieval_recall]

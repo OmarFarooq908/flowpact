@@ -1,0 +1,114 @@
+# Flowpact — empty starter (ai-draft-vs-gold)
+# Fill process, policies, success, evidence, open_slots. Then:
+#   flowpact validate
+#   flowpact asks
+#   flowpact no-claim
+flowpact: "0.1"
+
+meta:
+  name: ""  # e.g. Northwind Draft Copilot
+  client: ""
+  engagement: ""
+  owners:
+    wca: ""
+    delivery_lead: ""
+    client_sponsor: ""
+  updated: "1970-01-01"  # YYYY-MM-DD
+
+glossary:
+  - term: example_term
+    plain_english: Replace with engagement-facing glossary entries.
+
+process:
+  stages:
+    - id: ingest
+      name: Ingest
+      owner: ""
+      in_scope: true
+      does: ""
+      inputs: []
+      outputs: []
+    - id: generate
+      name: Generate draft
+      owner: ""
+      in_scope: true
+      does: ""
+      inputs: []
+      outputs: []
+    - id: validate
+      name: Validate vs gold
+      owner: ""
+      in_scope: true
+      does: ""
+      inputs: []
+      outputs: []
+    - id: downstream_publish
+      name: Downstream publish (out of scope)
+      owner: ""
+      in_scope: false
+      does: ""
+      inputs: []
+      outputs: []
+  boundary_note: >
+    Describe where this engagement stops (e.g. handoff to human review) vs
+    downstream systems owned elsewhere.
+
+policies:
+  - id: accuracy_method
+    question: What is the binding success metric (not whole-doc LLM judge alone)?
+    status: open
+    options:
+      - Structured field contract
+      - Other (document in decision)
+    decision: null
+    owner: ""
+    blocks: [answer_quality]
+
+success:
+  claims:
+    - id: answer_quality
+      statement: >
+        Plain-language definition of done for the headline accuracy claim
+        (population + gates + aggregate). Not auto-publish / not downstream runtime.
+      population:
+        include:
+          - field: locale
+            rule: ""
+        exclude:
+          - field: topic
+            rule: ""
+      hard_gates:
+        - field: ""
+          rule: ""
+          on_fail: zero_score
+      soft_fields:
+        - field: ""
+          method: embedding_similarity
+          weight: 1.0
+      aggregate: mean_score >= 0.90
+      not_measuring:
+        - engineering-only tracks
+  engineering_tracks:
+    - id: eng_quality
+      statement: Internal harness / tuning metrics — not the headline claim.
+      blocks_claim: false
+
+evidence:
+  - id: labeled_holdout
+    what: Ground-truth holdout set required to measure the claim.
+    required_for: [answer_quality]
+    status: missing
+    acceptance:
+      - N and format
+      - Eligibility slice
+      - Access method
+    owner: ""
+    ask: Deliver programmatic access to the labeled holdout (N, format, slice, access).
+
+open_slots:
+  - id: holdout_delivery
+    severity: critical
+    status: open
+    ask: Stakeholder delivers labeled holdout with acceptance criteria above.
+    owner: ""
+    blocks: [answer_quality]

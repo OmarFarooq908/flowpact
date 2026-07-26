@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flowpact.dev/schemas/pact.schema.json",
+  "title": "Flowpact pact.yaml",
+  "description": "Workflow + success pact for AI product engagements (flowpact 0.1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "flowpact",
+    "meta",
+    "glossary",
+    "process",
+    "policies",
+    "success",
+    "evidence",
+    "open_slots"
+  ],
+  "properties": {
+    "flowpact": {
+      "type": "string",
+      "const": "0.1",
+      "description": "Pact format version."
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "client", "engagement", "owners", "updated"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "client": { "type": "string", "minLength": 1 },
+        "engagement": { "type": "string", "minLength": 1 },
+        "owners": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wca", "delivery_lead", "client_sponsor"],
+          "properties": {
+            "wca": { "type": "string", "minLength": 1 },
+            "delivery_lead": { "type": "string", "minLength": 1 },
+            "client_sponsor": { "type": "string", "minLength": 1 }
+          }
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO date YYYY-MM-DD"
+        }
+      }
+    },
+    "glossary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["term", "plain_english"],
+        "properties": {
+          "term": { "type": "string", "minLength": 1 },
+          "plain_english": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stages", "boundary_note"],
+      "properties": {
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "owner", "in_scope", "does", "inputs", "outputs"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "name": { "type": "string", "minLength": 1 },
+              "owner": { "type": "string", "minLength": 1 },
+              "in_scope": { "type": "boolean" },
+              "does": { "type": "string", "minLength": 1 },
+              "inputs": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "outputs": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "boundary_note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "policies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "question", "status", "owner", "blocks"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "question": { "type": "string", "minLength": 1 },
+          "status": {
+            "type": "string",
+            "enum": ["resolved", "open", "blocked_on_client"]
+          },
+          "options": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "decision": {
+            "type": ["string", "null"]
+          },
+          "owner": { "type": "string", "minLength": 1 },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$"
+            }
+          }
+        }
+      }
+    },
+    "success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claims"],
+      "properties": {
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "statement",
+              "population",
+              "hard_gates",
+              "soft_fields",
+              "aggregate",
+              "not_measuring"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "statement": { "type": "string", "minLength": 1 },
+              "population": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["include", "exclude"],
+                "properties": {
+                  "include": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/field_rule" }
+                  },
+                  "exclude": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/field_rule" }
+                  }
+                }
+              },
+              "hard_gates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["field", "rule", "on_fail"],
+                  "properties": {
+                    "field": { "type": "string", "minLength": 1 },
+                    "rule": { "type": "string", "minLength": 1 },
+                    "on_fail": {
+                      "type": "string",
+                      "enum": ["zero_score"]
+                    }
+                  }
+                }
+              },
+              "soft_fields": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["field", "method", "weight"],
+                  "properties": {
+                    "field": { "type": "string", "minLength": 1 },
+                    "method": { "type": "string", "minLength": 1 },
+                    "weight": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  }
+                }
+              },
+              "aggregate": { "type": "string", "minLength": 1 },
+              "not_measuring": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "engineering_tracks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "statement", "blocks_claim"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "statement": { "type": "string", "minLength": 1 },
+              "blocks_claim": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "what",
+          "required_for",
+          "status",
+          "acceptance",
+          "owner",
+          "ask"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "what": { "type": "string", "minLength": 1 },
+          "required_for": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["missing", "partial", "delivered"]
+          },
+          "acceptance": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "owner": { "type": "string", "minLength": 1 },
+          "ask": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "open_slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "status", "ask", "owner", "blocks"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "resolved"]
+          },
+          "ask": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string", "minLength": 1 },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "field_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "rule"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1 },
+        "rule": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

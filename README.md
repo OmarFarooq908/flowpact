@@ -1,6 +1,7 @@
 # Flowpact
 
 [![CI](https://github.com/OmarFarooq908/flowpact/actions/workflows/ci.yml/badge.svg)](https://github.com/OmarFarooq908/flowpact/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/flowpact.svg)](https://pypi.org/project/flowpact/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 Human-writable **workflow + success contracts** for AI products.
@@ -21,11 +22,21 @@ Non-engineers (Workflow Contract Authors) capture process stages, scope boundari
 
 ## Install
 
+From PyPI:
+
+```bash
+pip install flowpact
+```
+
+From source (development):
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
+
+Releases are published from `v*` tags via GitHub Actions (Trusted Publishing). See [`CONTRIBUTING.md`](CONTRIBUTING.md#releasing-pypi).
 
 ## Commands
 

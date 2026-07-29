@@ -38,6 +38,34 @@ Do not add examples that mirror a real client’s field names or workflows — u
 3. Use the PR checklist template.
 4. Update docs/examples when behavior changes.
 
+## Releasing (PyPI)
+
+Publishing uses [Trusted Publishing](https://docs.pypi.org/trusted-publishers/) via `.github/workflows/publish.yml` (no API token in GitHub secrets).
+
+### One-time GitHub setup
+
+1. Repo **Settings → Environments → New environment** named `pypi`.
+2. On PyPI, the trusted publisher for project `flowpact` should match:
+   - Owner: `OmarFarooq908`
+   - Repository: `flowpact`
+   - Workflow: `publish.yml`
+   - Environment: `pypi`
+
+### Cut a release
+
+1. Bump `version` in `pyproject.toml` and update [`CHANGELOG.md`](CHANGELOG.md).
+2. Commit on `main`, then tag and push:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+3. The **Publish** workflow builds the sdist/wheel and uploads to PyPI.
+4. Verify: `pip install flowpact==0.1.0` then `flowpact --help`.
+
+Tag must match SemVer with a `v` prefix (`v0.1.0`, `v0.1.1`, …). Version in `pyproject.toml` should match the tag without the `v`.
+
 ## License
 
 By contributing, you agree your contributions are licensed under the Apache-2.0 license (see [`LICENSE`](LICENSE)).

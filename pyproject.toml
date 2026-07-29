@@ -28,14 +28,19 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.9",
+]
 
 [project.scripts]
 flowpact = "flowpact.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/devsinc/flowpact"
-Documentation = "https://github.com/devsinc/flowpact#readme"
+Homepage = "https://github.com/OmarFarooq908/flowpact"
+Documentation = "https://github.com/OmarFarooq908/flowpact#readme"
+Issues = "https://github.com/OmarFarooq908/flowpact/issues"
+Changelog = "https://github.com/OmarFarooq908/flowpact/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -45,3 +50,26 @@ flowpact = ["resources/*.json", "resources/templates/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # bugbear
+  "UP",  # pyupgrade
+]
+
+[tool.ruff.lint.flake8-bugbear]
+# Typer Argument/Option defaults are intentional and safe (immutable factory pattern).
+extend-immutable-calls = ["typer.Argument", "typer.Option"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

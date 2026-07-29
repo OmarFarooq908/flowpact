@@ -1,5 +1,8 @@
 # Flowpact
 
+[![CI](https://github.com/OmarFarooq908/flowpact/actions/workflows/ci.yml/badge.svg)](https://github.com/OmarFarooq908/flowpact/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 Human-writable **workflow + success contracts** for AI products.
 
 Non-engineers (Workflow Contract Authors) capture process stages, scope boundaries, policies, success recipes, and evidence requirements in one `pact.yaml`. The CLI validates the pact and derives **client ask lists** and **no-claim** gates — so teams stop reverse-engineering client workflow from meetings and arguing about accuracy without a shared definition of done.
@@ -50,6 +53,10 @@ Hand-derived spike reports: [`examples/draft-vs-gold/asks.hand.md`](examples/dra
 ## Schema
 
 Frozen format `flowpact: "0.1"` — JSON Schema at [`schemas/pact.schema.json`](schemas/pact.schema.json) (also shipped in the package). Design plan: [`docs/design/FLOWPACT_PLAN.md`](docs/design/FLOWPACT_PLAN.md).
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). CI runs ruff + pytest on Python 3.11–3.13.
 
 ## License
 

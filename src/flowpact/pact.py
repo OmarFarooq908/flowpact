@@ -17,8 +17,10 @@ class PactError(Exception):
 
 
 def _schema() -> dict[str, Any]:
-    raw = resources.files("flowpact").joinpath("resources/pact.schema.json").read_text(
-        encoding="utf-8"
+    raw = (
+        resources.files("flowpact")
+        .joinpath("resources/pact.schema.json")
+        .read_text(encoding="utf-8")
     )
     return json.loads(raw)
 
@@ -279,9 +281,7 @@ def export_eng_payload(pact: dict[str, Any]) -> dict[str, Any]:
         "soft_fields": primary.get("soft_fields"),
         "aggregate": primary.get("aggregate"),
         "not_measuring": primary.get("not_measuring"),
-        "out_of_scope_stage_ids": [
-            s["id"] for s in stages if not s.get("in_scope", True)
-        ],
+        "out_of_scope_stage_ids": [s["id"] for s in stages if not s.get("in_scope", True)],
         "resolved_policies": resolved,
         "engineering_tracks": (pact.get("success") or {}).get("engineering_tracks") or [],
     }

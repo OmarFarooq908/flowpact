@@ -6,7 +6,6 @@ import json
 import shutil
 from importlib import resources
 from pathlib import Path
-from typing import Optional
 
 import typer
 
@@ -107,9 +106,7 @@ def _format_asks_md(pact: dict, rows: list[dict]) -> str:
             lines.append("")
         blocks = ", ".join(f"`{b}`" for b in row.get("blocks") or []) or "_(none)_"
         kind = {"evidence": "E", "policy": "P", "open_slot": "S"}.get(row["kind"], "?")
-        lines.append(
-            f"### {kind} · `{row['id']}` ({row['status']}) → blocks {blocks}"
-        )
+        lines.append(f"### {kind} · `{row['id']}` ({row['status']}) → blocks {blocks}")
         lines.append(f"**Owner:** {row.get('owner', '')}  ")
         lines.append(f"**Ask:** {row.get('ask', '')}")
         opts = row.get("options") or []
@@ -125,9 +122,7 @@ def _format_asks_md(pact: dict, rows: list[dict]) -> str:
 @app.command()
 def asks(
     path: Path = typer.Argument(Path("pact.yaml"), help="Path to pact.yaml"),
-    output: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Write Markdown to this path"
-    ),
+    output: Path | None = typer.Option(None, "--output", "-o", help="Write Markdown to this path"),
 ) -> None:
     """Emit client ask list (undelivered evidence + open policies/slots)."""
     try:
@@ -190,9 +185,7 @@ def _format_no_claim_md(pact: dict) -> tuple[str, bool]:
 @app.command("no-claim")
 def no_claim(
     path: Path = typer.Argument(Path("pact.yaml"), help="Path to pact.yaml"),
-    output: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Write Markdown to this path"
-    ),
+    output: Path | None = typer.Option(None, "--output", "-o", help="Write Markdown to this path"),
     strict: bool = typer.Option(
         False,
         "--strict",
@@ -261,9 +254,7 @@ def _render_md(pact: dict) -> str:
         lines.append(f"- **{g.get('term')}** — {g.get('plain_english')}")
     lines.extend(["", "## Policies", ""])
     for p in pact.get("policies") or []:
-        lines.append(
-            f"- **`{p['id']}`** [{p.get('status')}] — {p.get('question', '')}"
-        )
+        lines.append(f"- **`{p['id']}`** [{p.get('status')}] — {p.get('question', '')}")
         if p.get("decision"):
             lines.append(f"  - Decision: {p['decision'].strip()}")
     lines.extend(["", "## Success claims", ""])
@@ -309,9 +300,7 @@ def _render_md(pact: dict) -> str:
 @app.command()
 def render(
     path: Path = typer.Argument(Path("pact.yaml"), help="Path to pact.yaml"),
-    output: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Write Markdown to this path"
-    ),
+    output: Path | None = typer.Option(None, "--output", "-o", help="Write Markdown to this path"),
 ) -> None:
     """Human-readable Markdown (process Mermaid, glossary, claims)."""
     try:

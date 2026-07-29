@@ -3,10 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
 *.egg
 *.egg-info/
-.eggs/
+eggs/
 dist/
 build/
 wheels/
@@ -16,54 +15,40 @@ MANIFEST
 *.manifest
 *.spec
 
-# Virtual environments
-.venv/
+# Virtual environments (non-hidden names)
 venv/
 ENV/
 env/
-.env/
-.python-version
 
-# Test / type / lint caches
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-.coverage.*
+# Test / coverage outputs
 htmlcov/
-.tox/
-.nox/
-.hypothesis/
-.cache/
 coverage.xml
 *.cover
-.dmypy.json
-dmypy.json
 
-# Packaging / install leftovers
+# Packaging leftovers
 src/*.egg-info/
-*.egg-info/
 
-# --- Secrets / local env ---
-.env
-.env.*
-!.env.example
+# --- Secrets ---
 *.pem
 *.key
 credentials.json
 secrets/
 
-# --- Tooling / IDE ---
-.idea/
-.vscode/
+# --- Editor junk ---
 *.swp
 *.swo
 *~
-.DS_Store
 Thumbs.db
 
-# Cursor local state (plans live in docs/design/)
-.cursor/
+# --- Hidden files/dirs (local tooling, envs, caches, IDE) ---
+# Do not track dotfiles. Un-ignore only what must be in the repo.
+.*
+!.gitignore
+!.github/
+!.github/**
+
+# Optional tracked env template (uncomment if you add one):
+# !.env.example
 
 # --- Flowpact local outputs ---
 export-eng.json

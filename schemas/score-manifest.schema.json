@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OmarFarooq908/flowpact/schemas/score-manifest.schema.json",
+  "title": "Flowpact score run manifest",
+  "type": "object",
+  "required": [
+    "flowpact_score_version",
+    "timestamp",
+    "id_field",
+    "claim_result",
+    "mean_score",
+    "hashes"
+  ],
+  "properties": {
+    "flowpact_score_version": { "type": "string" },
+    "timestamp": { "type": "string" },
+    "claim_id": { "type": ["string", "null"] },
+    "id_field": { "type": "string" },
+    "aggregate": { "type": "string" },
+    "claim_result": { "type": "string", "enum": ["PASS", "FAIL"] },
+    "mean_score": { "type": "number" },
+    "n_scored": { "type": "integer", "minimum": 0 },
+    "hashes": {
+      "type": "object",
+      "required": [
+        "export_eng",
+        "gold_keys",
+        "drafts",
+        "recipe",
+        "method_config",
+        "population"
+      ],
+      "properties": {
+        "export_eng": { "type": "string" },
+        "gold_keys": { "type": "string" },
+        "drafts": { "type": "string" },
+        "recipe": { "type": "string" },
+        "method_config": { "type": "string" },
+        "population": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

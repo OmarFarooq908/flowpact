@@ -65,3 +65,4 @@ def test_cli_export_eng(tmp_path: Path) -> None:
     assert "hard_gates" in text
     assert "help_center_publish" in text
     assert "citation_url" in text
+    assert '"export_schema": "1"' in text

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OmarFarooq908/flowpact/schemas/score-scorecard.schema.json",
+  "title": "Flowpact scorecard",
+  "type": "object",
+  "required": ["claim_result", "mean_score", "cases"],
+  "properties": {
+    "claim_id": { "type": ["string", "null"] },
+    "claim_result": { "type": "string", "enum": ["PASS", "FAIL"] },
+    "mean_score": { "type": "number" },
+    "aggregate": { "type": "string" },
+    "threshold": { "type": ["number", "null"] },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "score", "hard_gate_failed", "failed_gates", "soft_fields"],
+        "properties": {
+          "id": { "type": "string" },
+          "score": { "type": "number" },
+          "hard_gate_failed": { "type": "boolean" },
+          "failed_gates": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "soft_fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["field", "method", "weight", "score"],
+              "properties": {
+                "field": { "type": "string" },
+                "method": { "type": "string" },
+                "weight": { "type": "number" },
+                "score": { "type": "number" },
+                "gold": true,
+                "draft": true
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -269,6 +269,7 @@ def export_eng_payload(pact: dict[str, Any]) -> dict[str, Any]:
         if p.get("status") == "resolved"
     ]
     return {
+        "export_schema": "1",
         "flowpact": pact.get("flowpact"),
         "meta": {
             "name": (pact.get("meta") or {}).get("name"),

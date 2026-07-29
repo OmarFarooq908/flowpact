@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Optional `flowpact[score]` execution layer with console script `flowpact-score` (`run`, `diff`)
+- Offline soft methods: `exact_match`, `token_overlap`; stubs for `embedding_similarity` / `llm_judge` behind `[score-embed]` / `[score-llm]`
+- Score report schemas (manifest, scorecard, population audit) and Northwind `gold.jsonl` / `drafts.jsonl`
+- Additive `export_schema: "1"` on `flowpact export-eng` output (authoring `flowpact: "0.1"` unchanged)
+
+### Changed
+
+- Example / template soft method for answer body: `token_overlap` (CI-friendly offline)
+- README positioning: Flowpact defines → score executes; Trustline / RAGAS adjacent
+- CONTRIBUTING: optional score extra in scope; base package still excludes required LLM/embed deps
+
 ## [0.1.0] - 2026-07-29
 
 ### Added

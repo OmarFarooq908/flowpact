@@ -83,7 +83,7 @@ success:
           on_fail: zero_score
       soft_fields:
         - field: ""
-          method: embedding_similarity
+          method: token_overlap
           weight: 1.0
       aggregate: mean_score >= 0.90
       not_measuring:

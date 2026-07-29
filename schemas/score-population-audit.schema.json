@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OmarFarooq908/flowpact/schemas/score-population-audit.schema.json",
+  "title": "Flowpact score population audit",
+  "type": "object",
+  "required": [
+    "n_gold",
+    "n_drafts",
+    "n_paired",
+    "n_scored",
+    "n_excluded",
+    "reason_histogram",
+    "exclude_reasons"
+  ],
+  "properties": {
+    "n_gold": { "type": "integer", "minimum": 0 },
+    "n_drafts": { "type": "integer", "minimum": 0 },
+    "n_paired": { "type": "integer", "minimum": 0 },
+    "n_scored": { "type": "integer", "minimum": 0 },
+    "n_excluded": { "type": "integer", "minimum": 0 },
+    "reason_histogram": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "exclude_reasons": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

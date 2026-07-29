@@ -6,5 +6,5 @@
 
 - [ ] `ruff check .` and `ruff format .` pass
 - [ ] `pytest` passes
-- [ ] Change stays within Flowpact non-goals (no SQL contracts, LLM eval, SaaS, or orchestration)
+- [ ] Change stays within Flowpact non-goals (no SQL contracts, required LLM/embed deps in base, SaaS, or orchestration)
 - [ ] Docs / examples updated if behavior changed

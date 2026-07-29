@@ -1,0 +1,6 @@
+{"id": "q1", "locale": "en", "topic": "enrollment", "citation_url": "https://benefits.northwind.example/enrollment", "answer_body": "Open enrollment runs every November for medical dental and vision plans.", "topic_tag": "enrollment"}
+{"id": "q2", "locale": "en", "topic": "coverage", "citation_url": "https://benefits.northwind.example/coverage", "answer_body": "In-network coverage pays eighty percent after the annual deductible.", "topic_tag": "coverage"}
+{"id": "q3", "locale": "en", "topic": "claims", "citation_url": "https://benefits.northwind.example/claims", "answer_body": "Submit claims within ninety days with the itemized provider bill.", "topic_tag": "claims"}
+{"id": "q4", "locale": "en", "topic": "enrollment", "citation_url": "https://benefits.northwind.example/enrollment", "answer_body": "Dependents must be added during open enrollment or after a qualifying life event.", "topic_tag": "enrollment"}
+{"id": "q5", "locale": "es", "topic": "enrollment", "citation_url": "https://benefits.northwind.example/es/enrollment", "answer_body": "La inscripción abierta es en noviembre.", "topic_tag": "enrollment"}
+{"id": "q6", "locale": "en", "topic": "payroll", "citation_url": "https://benefits.northwind.example/payroll", "answer_body": "Payroll deductions update on the next pay cycle.", "topic_tag": "payroll"}

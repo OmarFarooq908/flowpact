@@ -38,17 +38,19 @@ flowpact/
 
 **Flowpact is.** A **workflow + success pact** for AI products: stages, ownership boundaries, policy decisions, success recipe, evidence required, and open slots. Non-engineers (Workflow Contract Author) write it. The tool validates completeness and emits **ask lists** + **no-claim reports**. Engineers consume a machine export (eligibility, hard gates, out-of-scope).
 
-**Non-goals (do not build or claim).**
+**Non-goals (do not build or claim in the base package).**
 
 | Adjacent tool                  | What it does                      | Why Flowpact is not that                                                         |
 | ------------------------------ | --------------------------------- | -------------------------------------------------------------------------------- |
 | Trustline / Great Expectations | SQL / data-seam integrity         | Flowpact does not query warehouses or compile SQL                                |
-| RAGAS / DeepEval               | Score model answers / traces      | Flowpact does not run LLM judges or embeddings                                   |
+| RAGAS / DeepEval               | Score free-text answers / traces  | Base Flowpact does not run LLM judges or embeddings                              |
 | OpenAPI / JSON Schema          | API or payload shape              | Flowpact does not validate runtime HTTP or candidate JSON schema                 |
 | Orchestrators (Airflow, etc.)  | Run pipelines                     | Flowpact does not schedule or execute generation                                 |
-| StructGate (future sibling)    | Field-level draft-vs-gold scoring | Flowpact only **defines** the success recipe; v0 exports JSON for a later scorer |
+| Full RAGAS replacement         | Free-text Q&A eval                | Optional `flowpact-score` is structured draft-vs-gold only                       |
 
-**One-line positioning.** Data contracts certify seams; eval kits score outputs; Flowpact certifies that the **engagement has defined workflow and success rules — and knows what is still missing**.
+**Positioning.** Flowpact **defines** the success recipe and exports JSON. Optional `flowpact[score]` / `flowpact-score` **executes** that claim (population, hard gates, soft fields, aggregate, regression diff). Trustline audits data seams; RAGAS remains adjacent free-text eval.
+
+**One-line positioning.** Data contracts certify seams; eval kits score free-text outputs; Flowpact certifies that the **engagement has defined workflow and success rules — and knows what is still missing**.
 
 ---
 
@@ -120,7 +122,7 @@ open_slots:               # derived + explicit; validate merges both
 
 - **Ask list** = every `evidence` with `status != delivered` + every `policy`/`open_slot` with `status` in `{open, blocked_on_client}`, sorted by severity and `blocks`.
 - **No-claim report** = for each `success.claims[]`, list blocking open slots/evidence/policies; exit non-zero if any claim has blockers when `--strict`.
-- **Eng export** = JSON: `population`, `hard_gates`, `soft_fields`, `out_of_scope_stage_ids`, `resolved_policies` — consumer for a future StructGate.
+- **Eng export** = JSON: `export_schema`, `population`, `hard_gates`, `soft_fields`, `out_of_scope_stage_ids`, `resolved_policies` — consumer for optional `flowpact-score`.
 
 ```mermaid
 flowchart LR
@@ -129,13 +131,14 @@ flowchart LR
   Asks[flowpact asks]
   NoClaim[flowpact no-claim]
   Eng[flowpact export-eng]
+  Score[flowpact-score run]
   WCA --> Val
   Val --> Asks
   Val --> NoClaim
   Val --> Eng
   Asks --> Meeting[Status meeting / email]
   NoClaim --> Status[Status / SOW honesty]
-  Eng --> Scorer[Future StructGate or harness]
+  Eng --> Score
 ```
 
 ---
@@ -162,7 +165,7 @@ Concrete filled pact: [`examples/draft-vs-gold/pact.yaml`](../../examples/draft-
 
 **process (in scope):** Policy corpus → Retrieve → Draft → Score → Human review. **Out of scope:** Help-center publish.
 
-**Headline claim `answer_quality`:** citation URL hard gate + answer body / topic tag soft fields; aggregate `mean_score >= 0.90`.
+**Headline claim `answer_quality`:** citation URL hard gate + answer body (`token_overlap`) / topic tag (`exact_match`) soft fields; aggregate `mean_score >= 0.90`. Holdout: `gold.jsonl` / `drafts.jsonl`.
 
 **Engineering track:** retrieval recall — does not block the headline claim.
 
@@ -183,11 +186,15 @@ Concrete filled pact: [`examples/draft-vs-gold/pact.yaml`](../../examples/draft-
 | `flowpact asks`       | Markdown/stdout ask list                                                                    |
 | `flowpact no-claim`   | Per-claim blocker report; `--strict` exit 1 if any claim blocked                            |
 | `flowpact render`     | Human-readable Markdown (process diagram as Mermaid, glossary, claims)                      |
-| `flowpact export-eng` | `export-eng.json` for harness/StructGate consumers                                          |
+| `flowpact export-eng` | `export-eng.json` for `flowpact-score` / harness consumers                                  |
+| `flowpact-score run`  | Optional: draft-vs-gold score from export-eng + gold/drafts JSONL                           |
+| `flowpact-score diff` | Optional: regression compare of two score manifests                                         |
 
 **Ship in v0:** JSON Schema, one template, synthetic example under `examples/draft-vs-gold/`, README with positioning vs Trustline/RAGAS, Apache-2.0.
 
-**Explicitly out of v0:** UI/SaaS, SSO, SQL checks, LLM calls, git PR bots, StructGate implementation, auto-email.
+**Optional score extra:** offline `exact_match` / `token_overlap`; embedding/LLM methods behind extras only (stubs in MVP).
+
+**Explicitly out of core/base:** UI/SaaS, SSO, SQL checks, required LLM/embed deps, git PR bots, auto-email, warehouse auditing.
 
 ---
 
@@ -217,6 +224,6 @@ Concrete filled pact: [`examples/draft-vs-gold/pact.yaml`](../../examples/draft-
 
 **Phase 2 — OSS skeleton.** Packaging, commands, JSON Schema, CI, README.
 
-**Phase 3 — Engagement rollout.** WCA training; later StructGate reads `export-eng.json`.
+**Phase 3 — Score extra + engagement rollout.** Optional `flowpact-score` reads `export-eng.json`; WCA training.
 
 **Phase 4 — Harden.** Pact version diffs; more templates (`rag-chat`, `agent-workflow`).

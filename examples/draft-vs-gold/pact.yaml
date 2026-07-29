@@ -112,25 +112,25 @@ success:
       statement: >
         Draft answer quality vs SME gold on English in-scope benefits topics only —
         not auto-publish to the help center. Binding recipe: missing/wrong citation_url
-        → score 0; else score = 0.70 × answer_body similarity + 0.30 × topic_tag exact match.
+        → score 0; else score = 0.70 × answer_body token_overlap + 0.30 × topic_tag exact match.
       population:
         include:
           - field: locale
-            rule: en
+            rule: equals en
           - field: topic
-            rule: in-scope benefits topics (enrollment, coverage, claims)
+            rule: in enrollment, coverage, claims
         exclude:
           - field: locale
-            rule: non-English (until locale_scope resolved)
+            rule: in es, fr, de
           - field: topic
-            rule: HR payroll / IT helpdesk (separate product)
+            rule: in payroll, helpdesk
       hard_gates:
         - field: citation_url
           rule: URL present and matches gold policy page
           on_fail: zero_score
       soft_fields:
         - field: answer_body
-          method: embedding_similarity
+          method: token_overlap
           weight: 0.70
         - field: topic_tag
           method: exact_match

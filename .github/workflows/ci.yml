@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,score]"
       - name: Ruff check
         run: ruff check .
       - name: Ruff format
@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,score]"
       - name: Pytest
         run: pytest -q
       - name: CLI smoke (example pact)
@@ -55,3 +55,23 @@ jobs:
           fi
           flowpact export-eng examples/draft-vs-gold/pact.yaml -o /tmp/export-eng.json
           test -s /tmp/export-eng.json
+          # Score run: example includes a hard-gate fail → claim FAIL (exit 1) is OK
+          set +e
+          flowpact-score run \
+            --export-eng /tmp/export-eng.json \
+            --gold examples/draft-vs-gold/gold.jsonl \
+            --drafts examples/draft-vs-gold/drafts.jsonl \
+            --out /tmp/score_run/
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ] && [ "$code" -ne 1 ]; then
+            echo "unexpected flowpact-score exit: $code" >&2
+            exit 1
+          fi
+          test -f /tmp/score_run/manifest.json
+          test -f /tmp/score_run/scorecard.json
+          test -f /tmp/score_run/population_audit.json
+          test -f /tmp/score_run/failure_cards.md
+          flowpact-score diff \
+            --baseline /tmp/score_run/manifest.json \
+            --candidate /tmp/score_run/manifest.json
